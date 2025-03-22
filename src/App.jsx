@@ -89,10 +89,16 @@ export default function App() {
     };
   }, []);
 
+  const handleNavigation = (path) => {
+  if (typeof window !== 'undefined') {
+    window.location.href = path;
+  }
+};
+
   const handleSignIn = (userid) => {
     if (userid == 1) {
       setIsAuthenticated(true);
-      window.location.href = "/staff";
+      handleNavigation("/staff");
     }
     setIsAuthenticated(true);
   };
