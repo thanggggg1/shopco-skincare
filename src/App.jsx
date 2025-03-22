@@ -50,6 +50,7 @@ import PaymentCallback from "./pages/Payment/PaymentCallback";
 import { CompareProvider } from "./pages/Compare/context";
 import ComparePage from "./pages/Compare/ComparePage";
 import CompareBar from "./pages/Compare/CompareBar";
+import { useNavigate } from "react-router-dom";
 
 // Component để hủy request khi chuyển trang
 function NavigationHandler() {
@@ -67,6 +68,7 @@ function NavigationHandler() {
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = () => {
@@ -92,7 +94,7 @@ export default function App() {
   const handleSignIn = (userid) => {
     if (userid == 1) {
       setIsAuthenticated(true);
-      window.location.href = "/staff";
+      navigate("/staff");
     }
     setIsAuthenticated(true);
   };
