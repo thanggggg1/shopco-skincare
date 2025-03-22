@@ -91,7 +91,7 @@ const Product = () => {
       Brand: product.brand,
       Origin: product.origin,
       Status: product.status,
-      ImgURL: product.imgURL,
+      ImgURL: product?.imageUrls?.[0],
       SkinType: product.skinType,
       Description: product.description,
       Ingredients: product.ingredients,

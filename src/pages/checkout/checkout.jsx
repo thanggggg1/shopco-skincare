@@ -476,13 +476,15 @@ const Checkout = () => {
             Thông tin kiện hàng
           </Typography>
           <Typography sx={{ mb: 2 }}>Giao trong 48 giờ</Typography>
-          
+          {
+            console.log("order", order)
+          }
           {order?.items?.$values && order.items.$values && order.items.$values.map((item) => (
             <Box key={item.orderItemId} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               {/* Product Image */}
               <Box sx={{ width: '50px', height: '50px', mr: 2 }}>
                 <img 
-                  src={item?.product?.imageUrls?.[0] || "https://klairscosmetics.com/wp-content/uploads/2017/04/supple-toner-1.jpg"} 
+                  src={item?.product?.imageUrls?.[0]} 
                   // alt={item.product?.productName || "Product"} 
                   alt="Product"
                   style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }} 

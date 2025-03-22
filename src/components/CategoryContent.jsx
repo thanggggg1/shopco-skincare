@@ -253,7 +253,7 @@ const CategoryContent = () => {
             }
             
             // Lọc sản phẩm theo categoryId
-            const data = _products.filter(x => x.categoryId == categoryId);            
+            const data = _products.filter(x => x.categoryId == categoryId);    
             
             const mappedProducts = data.map(product => ({
                 id: product.productId,
@@ -264,7 +264,7 @@ const CategoryContent = () => {
                 categoryId: product.categoryId,
                 description: product.description,
                 capacity: product.capacity,
-                image: product.imgURL || '/placeholder.jpg',
+                imageUrls: product?.imageUrls || [],
                 quantity: product.quantity,
                 status: product.status
             }));
@@ -431,7 +431,7 @@ const CategoryContent = () => {
                 price: product.price,
                 brand: product.brand,
                 capacity: product.capacity,
-                image: product.imgURL || '/placeholder.jpg',
+                imageUrls: product?.imageUrls || [],
                 quantity: product.quantity,
                 status: product.status
             }));
@@ -508,7 +508,7 @@ const CategoryContent = () => {
                 categoryId: product.categoryId,
                 description: product.description,
                 capacity: product.capacity,
-                image: product.imgURL || '/placeholder.jpg',
+                imageUrls: product?.imageUrls || [],
                 quantity: product.quantity,
                 status: product.status
             }));
@@ -910,7 +910,7 @@ const CategoryContent = () => {
                 price: product.price,
                 brand: product.brand,
                 capacity: product.capacity,
-                image: product.imgURL || '/placeholder.jpg',
+                imageUrls: product?.imageUrls || [],
                 quantity: product.quantity,
                 status: product.status
             }));
