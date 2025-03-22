@@ -12,7 +12,7 @@ const cancelTokens = {};
 // });
 
 const axiosClient = axios.create({
-    baseURL: 'https://58.186.99.227:7175',
+    baseURL: 'http://58.186.99.227:7175',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -23,6 +23,7 @@ const excludeFromCancellation = [
     '/api/Users/profile',
     '/api/Users/',
     '/api/Orders/current/',
+    '/api/Products/',
     '/api/Voucher'
 ];
 

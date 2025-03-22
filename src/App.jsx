@@ -47,6 +47,9 @@ import Feedback from "./pages/Manager/Feedback";
 import PaymentSuccess from "./pages/Payment/PaymentSuccess";
 import PaymentFailed from "./pages/Payment/PaymentFailed";
 import PaymentCallback from "./pages/Payment/PaymentCallback";
+import { CompareProvider } from "./pages/Compare/context";
+import ComparePage from "./pages/Compare/ComparePage";
+import CompareBar from "./pages/Compare/CompareBar";
 
 // Component để hủy request khi chuyển trang
 function NavigationHandler() {
@@ -97,116 +100,112 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <BrowserRouter>
-        {/* Component để hủy request khi chuyển trang */}
-        <NavigationHandler />
-        <CssBaseline />
-        
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<MainScreen onSignOut={handleSignOut} />} />
-          <Route path="/product/:id" element={<ProductScreen />} />
-          <Route path="/search" element={<SearchResults />} />
-          <Route path="/category" element={<CategoryScreen />} />
-          <Route path="/categories" element={<CategoryContent />} />
-          <Route path="/categories/:id" element={<CategoryContent />} />
-          <Route path="/brand/:brandName" element={<BrandProducts />} />
-          <Route path="/quiz" element={<QuizTest />} />
+      <CompareProvider>
+        <BrowserRouter>
+          {/* Component để hủy request khi chuyển trang */}
+          <NavigationHandler />
+          <CssBaseline />
           
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog1" element={<Blog1 />} />
-          <Route path="/blog2" element={<Blog2 />} />
-          <Route path="/blog3" element={<Blog3 />} />
-          <Route path="/blog4" element={<Blog4 />} />
-          <Route path="/blog5" element={<Blog5 />} />
-          <Route path="/blog6" element={<Blog6 />} />
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/" element={<MainScreen onSignOut={handleSignOut} />} />
+            <Route path="/product/:id" element={<ProductScreen />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/category" element={<CategoryScreen />} />
+            <Route path="/categories" element={<CategoryContent />} />
+            <Route path="/categories/:id" element={<CategoryContent />} />
+            <Route path="/brand/:brandName" element={<BrandProducts />} />
+            <Route path="/quiz" element={<QuizTest />} />
+            
+            {/* Compare Routes */}
+            <Route path="/compare" element={<ComparePage />} />
+            
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog1" element={<Blog1 />} />
+            <Route path="/blog2" element={<Blog2 />} />
+            <Route path="/blog3" element={<Blog3 />} />
+            <Route path="/blog4" element={<Blog4 />} />
+            <Route path="/blog5" element={<Blog5 />} />
+            <Route path="/blog6" element={<Blog6 />} />
 
-          {/* Static Pages */}
-          <Route path="/da-dau" element={<DaDau />} />
-          <Route path="/da-kho" element={<DaKho />} />
-          <Route path="/da-thuong" element={<DaThuong />} />
-          <Route path="/da-hon-hop" element={<DaHonHop />} />
-          <Route path="/da-nhay-cam" element={<DaNhayCam />} />
-          <Route path="/intro" element={<Intro />} />
-          <Route path="/buy" element={<Buy />} />
-          <Route path="/term" element={<Term />} />
-          <Route path="/policy" element={<PrivacyPolicy />} />
-          <Route path="/complaint" element={<Complaint />} />
-          <Route path="/return" element={<Return />} />
-          <Route path="/payment/success" element={<PaymentSuccess />} />
-          <Route path="/payment/fail" element={<PaymentFailed />} />
-          <Route path="/payment/callback" element={<PaymentCallback />} />
+            {/* Static Pages */}
+            <Route path="/da-dau" element={<DaDau />} />
+            <Route path="/da-kho" element={<DaKho />} />
+            <Route path="/da-thuong" element={<DaThuong />} />
+            <Route path="/da-hon-hop" element={<DaHonHop />} />
+            <Route path="/da-nhay-cam" element={<DaNhayCam />} />
+            <Route path="/intro" element={<Intro />} />
+            <Route path="/buy" element={<Buy />} />
+            <Route path="/term" element={<Term />} />
+            <Route path="/policy" element={<PrivacyPolicy />} />
+            <Route path="/complaint" element={<Complaint />} />
+            <Route path="/return" element={<Return />} />
+            <Route path="/payment/success" element={<PaymentSuccess />} />
+            <Route path="/payment/fail" element={<PaymentFailed />} />
+            <Route path="/payment/callback" element={<PaymentCallback />} />
 
-  {/* {
-    path: '/payment/success',
-    component: PaymentSuccessPage
-  },
-  {
-    path: '/payment/failed',
-    component: PaymentFailedPage
-  },
-  {
-    path: '/payment/callback',
-    component: PaymentCallbackPage
-  } */}
-          {/* Auth Routes */}
-          <Route
-            path="/login"
-            element={
-              isAuthenticated ? (
-                <Navigate to="/" />
-              ) : (
-                <SigninPage onSignIn={handleSignIn} />
-              )
-            }
-          />
+            {/* Auth Routes */}
+            <Route
+              path="/login"
+              element={
+                isAuthenticated ? (
+                  <Navigate to="/" />
+                ) : (
+                  <SigninPage onSignIn={handleSignIn} />
+                )
+              }
+            />
 
-          {/* Protected Routes */}
-          <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <Cart />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/customer-support"
-            element={
-              <ProtectedRoute>
-                <CustomerSp />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/account"
-            element={
-              <ProtectedRoute>
-                <Info onSignOut={handleSignOut} />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/orders"
-            element={
-              <ProtectedRoute>
-                <Order onSignOut={handleSignOut} />
-              </ProtectedRoute>
-            }
-          />
-          <Route path="/checkout/:orderId" element={<Checkout />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/viewOrder" element={<ViewOrder />} />
-          <Route path="/product" element={<Product />} />
-          <Route path="/revenue" element={<Revenue />} />
-          <Route path="/staff" element={<Staff />} />
-          <Route path="/viewCustomer" element={<ViewCustomer />} />
-          <Route path="/viewSupport" element={<ViewSupport />} />
-          <Route path="/voucher" element={<Voucher />} />
-          <Route path="/feedback" element={<Feedback />} />
+            {/* Protected Routes */}
+            <Route
+              path="/cart"
+              element={
+                <ProtectedRoute>
+                  <Cart />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/customer-support"
+              element={
+                <ProtectedRoute>
+                  <CustomerSp />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/account"
+              element={
+                <ProtectedRoute>
+                  <Info onSignOut={handleSignOut} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/orders"
+              element={
+                <ProtectedRoute>
+                  <Order onSignOut={handleSignOut} />
+                </ProtectedRoute>
+              }
+            />
+            <Route path="/checkout/:orderId" element={<Checkout />} />
+            <Route path="/checkout" element={<Checkout />} />
+            <Route path="/viewOrder" element={<ViewOrder />} />
+            <Route path="/product" element={<Product />} />
+            <Route path="/revenue" element={<Revenue />} />
+            <Route path="/staff" element={<Staff />} />
+            <Route path="/viewCustomer" element={<ViewCustomer />} />
+            <Route path="/viewSupport" element={<ViewSupport />} />
+            <Route path="/voucher" element={<Voucher />} />
+            <Route path="/feedback" element={<Feedback />} />
+            
+          </Routes>
           
-        </Routes>
-      </BrowserRouter>
+          {/* CompareBar is rendered outside the Routes to be visible on all pages */}
+          <CompareBar />
+        </BrowserRouter>
+      </CompareProvider>
     </ErrorBoundary>
   );
 }
