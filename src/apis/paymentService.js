@@ -1,9 +1,9 @@
-import axios from 'axios';
+import axiosClient from './axiosClient';
 
 // Function to verify payment
 export const verifyPayment = async (orderId, transactionRef, responseCode, amount, transactionStatus, secureHash) => {
   try {
-    const response = await axios.get('/api/Payments/PaymentCallback', {
+    const response = await axiosClient.get('/api/Payments/PaymentCallback', {
       params: {
         orderId: orderId,
         vnp_TxnRef: transactionRef,
