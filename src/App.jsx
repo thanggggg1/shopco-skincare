@@ -89,7 +89,11 @@ export default function App() {
     };
   }, []);
 
-  const handleSignIn = () => {
+  const handleSignIn = (userid) => {
+    if (userid == 1) {
+      setIsAuthenticated(true);
+      window.location.href = "/staff";
+    }
     setIsAuthenticated(true);
   };
 
