@@ -246,6 +246,7 @@ const Checkout = () => {
         //max 30 character for delivery address
         const response = await orderService.confirmpayment(order.orderId, paymentMethod, deliveryAddress.substring(0, 30), paymentMethod);
         //navigate to response url payment
+        localStorage.setItem('orderId', order.orderId);
         window.location.href = response.paymentUrl;
         // setThankYouDialogOpen(true);
       }
@@ -479,7 +480,7 @@ const Checkout = () => {
           {order?.items?.$values && order.items.$values && order.items.$values.map((item) => (
             <Box key={item.orderItemId} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
               {/* Product Image */}
-              <Box sx={{ width: '70px', height: '70px', mr: 2 }}>
+              <Box sx={{ width: '50px', height: '50px', mr: 2 }}>
                 <img 
                   src={item?.product?.imageUrls?.[0] || "https://klairscosmetics.com/wp-content/uploads/2017/04/supple-toner-1.jpg"} 
                   // alt={item.product?.productName || "Product"} 

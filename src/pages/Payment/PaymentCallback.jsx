@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import "./index.css";
 import LoadingIcon from "../../assets/svg/loading.svg";
 import { verifyPayment } from '../../apis/paymentService';
@@ -19,7 +18,7 @@ const PaymentCallback = () => {
         const vnpSecureHash = searchParams.get('vnp_SecureHash');
         const vnpAmount = searchParams.get('vnp_Amount');
         const transactionStatus = searchParams.get('vnp_TransactionStatus');
-        
+        const orderId = localStorage.getItem('orderId');
         if (!txnRef || !vnpSecureHash || !vnpAmount || !transactionStatus) {
           console.error('Missing required payment parameters');
           navigate('/payment/failed');
@@ -30,7 +29,7 @@ const PaymentCallback = () => {
         if (responseCode === '00') {
           try {
             // Use paymentService to verify and update payment status
-            const result = await verifyPayment(txnRef, responseCode, vnpAmount, transactionStatus, vnpSecureHash);
+            const result = await verifyPayment(orderId, txnRef, responseCode, vnpAmount, transactionStatus, vnpSecureHash);
             
             if (result.success) {
               navigate('/payment/success');

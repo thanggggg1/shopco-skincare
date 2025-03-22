@@ -1,10 +1,11 @@
 import axios from 'axios';
 
 // Function to verify payment
-export const verifyPayment = async (transactionRef, responseCode, amount, transactionStatus, secureHash) => {
+export const verifyPayment = async (orderId, transactionRef, responseCode, amount, transactionStatus, secureHash) => {
   try {
     const response = await axios.get('/api/Payments/PaymentCallback', {
       params: {
+        orderId: orderId,
         vnp_TxnRef: transactionRef,
         vnp_ResponseCode: responseCode,
         vnp_Amount: amount,
