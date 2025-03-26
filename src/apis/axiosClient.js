@@ -12,7 +12,7 @@ const cancelTokens = {};
 // });
 
 const axiosClient = axios.create({
-    baseURL: 'https://a2f6-2405-4802-1bbc-b500-2126-c644-9d6-cc94.ngrok-free.app',
+    baseURL: 'https://ffb5-2405-4802-1bb2-2c50-6d15-ab1e-29f7-2dd6.ngrok-free.app',
     headers: {
         'Content-Type': 'application/json',
     },
