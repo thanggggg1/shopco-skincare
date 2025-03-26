@@ -20,6 +20,12 @@ const Staff = () => {
     { id: 'feedback', name: 'Feedback', icon: '📢' },
   ];
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userid");
+    window.location.href = "/";
+  };
+
   const tabs = ['Nhân viên A',  'Nhân viên B'];
 
   return (
@@ -48,7 +54,7 @@ const Staff = () => {
           ))}
         </div>
         
-        <div className="logout-button" onClick={() => navigate('/')}>
+        <div className="logout-button" onClick={handleLogout}>
           <span className="logout-icon">🚪</span>
           <span>Đăng Xuất</span>
         </div>

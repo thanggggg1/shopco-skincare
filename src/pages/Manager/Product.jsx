@@ -290,6 +290,12 @@ const Product = () => {
     setSearchTerm('');
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userid");
+    window.location.href = "/";
+  };
+
   return (
     <Box sx={{ bgcolor: "#f0f0f0", minHeight: "100vh", width:'99vw' }}>
       <div className="manager-container">
@@ -316,7 +322,7 @@ const Product = () => {
             ))}
           </div>
           
-          <div className="logout-button" onClick={() => navigate('/')}>
+          <div className="logout-button" onClick={handleLogout}>
             <span className="logout-icon">🚪</span>
             <span>Đăng Xuất</span>
           </div>

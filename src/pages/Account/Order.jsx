@@ -34,6 +34,7 @@ const Order = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("userid");
     window.location.href = "/";
   };
 

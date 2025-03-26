@@ -118,6 +118,7 @@ const Header = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("userid");
     handleAccountMenuClose();
     window.location.href = "/";
   };

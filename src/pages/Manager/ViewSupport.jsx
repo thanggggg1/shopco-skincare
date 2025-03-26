@@ -18,6 +18,11 @@ const ViewSupport = () => {
     { id: 'voucher', name: 'Vouchers', icon: '🎫' },
     { id: 'feedback', name: 'Feedback', icon: '📢' },
   ];
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userid");
+    window.location.href = "/";
+  };
 
   return (
     <Box sx={{ bgcolor: "#f0f0f0", minHeight: "100vh", width:'99vw' }}>
@@ -45,7 +50,7 @@ const ViewSupport = () => {
           ))}
         </div>
         
-        <div className="logout-button" onClick={() => navigate('/')}>
+        <div className="logout-button" onClick={handleLogout}>
           <span className="logout-icon">🚪</span>
           <span>Đăng Xuất</span>
         </div>

@@ -63,6 +63,11 @@ const ViewCustomer = () => {
       isMounted = false;
     };
   }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userid");
+    window.location.href = "/";
+  };
 
   useEffect(() => {
     if (!searchTerm.trim()) {
@@ -117,7 +122,7 @@ const ViewCustomer = () => {
           ))}
         </div>
         
-        <div className="logout-button" onClick={() => navigate('/')}>
+        <div className="logout-button" onClick={handleLogout}>
           <span className="logout-icon">🚪</span>
           <span>Đăng Xuất</span>
         </div>

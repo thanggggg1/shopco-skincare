@@ -108,6 +108,7 @@ const Info = () => {
 
   const handleLogout = () => {
     userService.logout();
+        localStorage.removeItem("userid");
     window.location.href = "/";
   };
 

@@ -194,6 +194,11 @@ const Feedback = () => {
     setSelectedRating('');
     setSearchTerm('');
   };
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    localStorage.removeItem("userid");
+    window.location.href = "/";
+  };
 
   // Tạo danh sách rating cho bộ lọc
   const ratingOptions = [1, 2, 3, 4, 5];
@@ -224,7 +229,7 @@ const Feedback = () => {
           ))}
         </div>
         
-        <div className="logout-button" onClick={() => navigate('/')}>
+        <div className="logout-button" onClick={handleLogout}>
           <span className="logout-icon">🚪</span>
           <span>Đăng Xuất</span>
         </div>
