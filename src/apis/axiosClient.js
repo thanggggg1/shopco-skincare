@@ -24,7 +24,8 @@ const excludeFromCancellation = [
     '/api/Users/',
     '/api/Orders/current/',
     '/api/Products/',
-    '/api/Voucher'
+    '/api/Voucher',
+    '/api/Category'
 ];
 
 // Hàm kiểm tra xem một endpoint có nên được loại trừ khỏi cơ chế hủy không

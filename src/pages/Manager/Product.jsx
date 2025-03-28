@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { FaFilter } from 'react-icons/fa';
-import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, Pagination, CircularProgress } from '@mui/material';
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, Pagination, CircularProgress, TextField, Alert, Snackbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import './Manager.css';
 import productService from '../../apis/productService';
@@ -18,10 +18,40 @@ const Product = () => {
   const [originalProducts, setOriginalProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [categories, setCategories] = useState([]);
   
   // Phân trang
   const [page, setPage] = useState(1);
   const pageSize = 20;
+
+  // State cho modals và form
+  const [openAddModal, setOpenAddModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [productForm, setProductForm] = useState({
+    productCode: '',
+    categoryId: '',
+    productName: '',
+    quantity: 0,
+    capacity: '',
+    price: 0,
+    brand: '',
+    origin: '',
+    status: 'Available',
+    imageUrls: [],
+    skinType: '',
+    description: '',
+    ingredients: '',
+    usageInstructions: '',
+    manufactureDate: '',
+    ngayNhapKho: ''
+  });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
 
   const sidebarItems = [
     // { id: 'revenue', name: 'Doanh thu', icon: '📊' },
@@ -39,9 +69,7 @@ const Product = () => {
   // Lấy danh sách danh mục
   const fetchCategories = async () => {
     try {
-      console.log('Fetching categories...');
       const response = await categoryService.getCategories();
-      console.log('Categories response:', response);
       
       const map = {};
       
@@ -130,7 +158,27 @@ const Product = () => {
 
   // Gọi lần đầu khi component mount
   useEffect(() => {
-    fetchProducts();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        // Fetch categories
+        const categoriesResponse = await categoryService.getCategories();
+        const categoriesData = Array.isArray(categoriesResponse) ? categoriesResponse : 
+          (categoriesResponse.$values || []);
+        console.log("categoriesData", categoriesData);
+        setCategories(categoriesData);
+        
+        // Fetch products
+        await fetchProducts();
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Đã xảy ra lỗi khi tải dữ liệu');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   // Xử lý tìm kiếm
@@ -183,14 +231,119 @@ const Product = () => {
     setPage(newPage);
   };
 
-  const handleEdit = (productId) => {
-    // Logic để chỉnh sửa sản phẩm
-    console.log(`Edit product with ID: ${productId}`);
+  const handleAdd = () => {
+    setProductForm({
+      productCode: '',
+      categoryId: '',
+      productName: '',
+      quantity: 0,
+      capacity: '',
+      price: 0,
+      brand: '',
+      origin: '',
+      status: 'Available',
+      imageUrls: [],
+      skinType: '',
+      description: '',
+      ingredients: '',
+      usageInstructions: '',
+      manufactureDate: '',
+      ngayNhapKho: ''
+    });
+    setOpenAddModal(true);
   };
 
-  const handleDelete = (productId) => {
-    // Logic để xóa sản phẩm
-    console.log(`Delete product with ID: ${productId}`);
+  const handleEdit = (product) => {
+    setSelectedProduct(product);
+    console.log("product", product);
+    const category = categories.find(category => category.categoryType === product.categoryType);
+    setProductForm({
+      productCode: product.ProductCode,
+      categoryId: category.categoryId,
+      productName: product.ProductName,
+      quantity: product.Quantity,
+      capacity: product.Capacity,
+      price: product.Price,
+      brand: product.Brand,
+      origin: product.Origin,
+      status: product.Status,
+      imageUrls: product.ImgURL ? [product.ImgURL] : [],
+      skinType: product.SkinType,
+      description: product.Description,
+      ingredients: product.Ingredients,
+      usageInstructions: product.UsageInstructions,
+      manufactureDate: product.ManufactureDate,
+      ngayNhapKho: product.ngayNhapKho
+    });
+    setOpenEditModal(true);
+  };
+
+  const handleDelete = (product) => {
+    setSelectedProduct(product);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await productService.deleteProduct(selectedProduct.ProductID);
+      setSnackbar({
+        open: true,
+        message: 'Xóa sản phẩm thành công',
+        severity: 'success'
+      });
+      fetchProducts(); // Refresh danh sách sản phẩm
+      setOpenDeleteDialog(false);
+    } catch {
+      setSnackbar({
+        open: true,
+        message: 'Có lỗi xảy ra khi xóa sản phẩm',
+        severity: 'error'
+      });
+    }
+  };
+
+  console.log("selectedProduct", selectedProduct);
+
+  const handleSubmit = async (isEdit = false) => {
+    try {
+      // Ensure categoryId is a number
+      const formattedData = {
+        ...productForm,
+        ImgUrl:"",
+        categoryId: parseInt(productForm.categoryId)
+      };
+
+
+
+      if (isEdit) {
+        await productService.updateProduct(selectedProduct.ProductID, formattedData);
+        setSnackbar({
+          open: true,
+          message: 'Cập nhật sản phẩm thành công',
+          severity: 'success'
+        });
+      } else {
+        await productService.createProduct(formattedData);
+        setSnackbar({
+          open: true,
+          message: 'Thêm sản phẩm thành công',
+          severity: 'success'
+        });
+      }
+      fetchProducts(); // Refresh danh sách sản phẩm
+      setOpenAddModal(false);
+      setOpenEditModal(false);
+    } catch {
+      setSnackbar({
+        open: true,
+        message: `Có lỗi xảy ra khi ${isEdit ? 'cập nhật' : 'thêm'} sản phẩm`,
+        severity: 'error'
+      });
+    }
+  };
+
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
   };
 
   const handleFilterClick = () => {
@@ -251,11 +404,6 @@ const Product = () => {
     setProducts(originalProducts);
     // Reset thông báo số lượng lọc khi xóa tìm kiếm
     setFilteredCount(0);
-  };
-
-  const handleAdd = () => {
-    console.log('Thêm sản phẩm mới');
-    // TODO: Implement add logic
   };
 
   // Tạo danh sách danh mục kết hợp cho bộ lọc
@@ -471,9 +619,6 @@ const Product = () => {
                       <th style={{ width: '100px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>TRẠNG THÁI</th>
                       <th style={{ width: '100px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>HÌNH ẢNH</th>
                       <th style={{ width: '100px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>LOẠI DA</th>
-                      <th style={{ width: '120px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>THÔNG TIN</th>
-                      <th style={{ width: '120px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>THÀNH PHẦN</th>
-                      <th style={{ width: '120px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>CÁCH DÙNG</th>
                       <th style={{ width: '110px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>NGÀY SẢN XUẤT</th>
                       <th style={{ width: '110px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>NGÀY NHẬP KHO</th>
                       <th style={{ width: '120px', padding: '12px 8px', borderBottom: '2px solid #dee2e6', fontWeight: 'bold', color: '#495057', textAlign: 'center' }}>THAO TÁC</th>
@@ -539,7 +684,7 @@ const Product = () => {
                           <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'left' }}>{product.Brand}</td>
                           <td style={{ whiteSpace: 'nowrap', overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>
                             <button
-                              onClick={() => handleEdit(product.ProductID)}
+                              onClick={() => handleEdit(product)}
                               style={{
                                 padding: '5px 10px',
                                 backgroundColor: '#007bff',
@@ -555,7 +700,7 @@ const Product = () => {
                               Sửa
                             </button>
                             <button
-                              onClick={() => handleDelete(product.ProductID)}
+                              onClick={() => handleDelete(product)}
                               style={{
                                 padding: '5px 10px',
                                 backgroundColor: '#dc3545',
@@ -579,16 +724,15 @@ const Product = () => {
                           <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'left' }}>{product.Brand}</td>
                           <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'center' }}>{product.Origin}</td>
                           <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'center' }}>{product.Status}</td>
-                          <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'center' }}>{product.ImgURL}</td>
+                          <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'center' }}>
+                            <img src={product.ImgURL} alt={product.ProductName} style={{ width: '80px', height: '80px', objectFit: 'cover' }} />
+                          </td>
                           <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'center' }}>{product.SkinType}</td>
-                          <td style={{ overflow: 'auto', maxHeight: '20px', overflowY: 'auto', maxWidth: '120px', width: '120px', whiteSpace: 'normal', textOverflow: 'ellipsis', padding: '8px 8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'left' }}>{product.Description}</td>
-                          <td style={{ overflow: 'auto', maxHeight: '20px', overflowY: 'auto', maxWidth: '120px', width: '120px', whiteSpace: 'normal', textOverflow: 'ellipsis', padding: '8px 8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'left' }}>{product.Ingredients}</td>
-                          <td style={{ overflow: 'auto', maxHeight: '20px', overflowY: 'auto', maxWidth: '120px', width: '120px', whiteSpace: 'normal', textOverflow: 'ellipsis', padding: '8px 8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'left' }}>{product.UsageInstructions}</td>
                           <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'center' }}>{product.ManufactureDate}</td>
                           <td style={{ overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', fontSize: '14px', textAlign: 'center' }}>{product.ngayNhapKho}</td>
                           <td style={{ whiteSpace: 'nowrap', overflow: 'auto', maxHeight: '100px', padding: '8px', borderBottom: '1px solid #dee2e6', textAlign: 'center' }}>
                             <button
-                              onClick={() => handleEdit(product.ProductID)}
+                              onClick={() => handleEdit(product)}
                               style={{
                                 padding: '5px 10px',
                                 backgroundColor: '#007bff',
@@ -604,7 +748,7 @@ const Product = () => {
                               Sửa
                             </button>
                             <button
-                              onClick={() => handleDelete(product.ProductID)}
+                              onClick={() => handleDelete(product)}
                               style={{
                                 padding: '5px 10px',
                                 backgroundColor: '#dc3545',
@@ -693,6 +837,181 @@ const Product = () => {
           <Button onClick={handleFilterApply} color="primary">Áp dụng</Button>
         </DialogActions>
       </Dialog>
+
+      {/* Add/Edit Product Modal */}
+      <Dialog 
+        open={openAddModal || openEditModal} 
+        onClose={() => {
+          setOpenAddModal(false);
+          setOpenEditModal(false);
+        }}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          {openAddModal ? 'Thêm sản phẩm mới' : 'Chỉnh sửa sản phẩm'}
+        </DialogTitle>
+        <DialogContent>
+          <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 2, mt: 2 }}>
+            <TextField
+              label="Mã sản phẩm"
+              value={productForm.productCode}
+              onChange={(e) => setProductForm({ ...productForm, productCode: e.target.value })}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Tên sản phẩm"
+              value={productForm.productName}
+              onChange={(e) => setProductForm({ ...productForm, productName: e.target.value })}
+              fullWidth
+              required
+            />
+            <Select
+              value={productForm.categoryId}
+              onChange={(e) => setProductForm({ ...productForm, categoryId: e.target.value })}
+              displayEmpty
+              fullWidth
+              required
+            >
+              <MenuItem value="" disabled>
+                <em>Chọn danh mục</em>
+              </MenuItem>
+              {categories.map((category) => (
+                <MenuItem key={category.categoryId} value={category.categoryId}>
+                  {category.categoryType} - {category.categoryName}
+                </MenuItem>
+              ))}
+            </Select>
+            <TextField
+              label="Số lượng"
+              type="number"
+              value={productForm.quantity}
+              onChange={(e) => setProductForm({ ...productForm, quantity: parseInt(e.target.value) })}
+              fullWidth
+              required
+              inputProps={{ min: 0 }}
+            />
+            <TextField
+              label="Dung tích"
+              value={productForm.capacity}
+              onChange={(e) => setProductForm({ ...productForm, capacity: e.target.value })}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Giá"
+              type="number"
+              value={productForm.price}
+              onChange={(e) => setProductForm({ ...productForm, price: parseInt(e.target.value) })}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Thương hiệu"
+              value={productForm.brand}
+              onChange={(e) => setProductForm({ ...productForm, brand: e.target.value })}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Xuất xứ"
+              value={productForm.origin}
+              onChange={(e) => setProductForm({ ...productForm, origin: e.target.value })}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Loại da"
+              value={productForm.skinType}
+              onChange={(e) => setProductForm({ ...productForm, skinType: e.target.value })}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Ngày sản xuất"
+              type="date"
+              value={productForm.manufactureDate}
+              onChange={(e) => setProductForm({ ...productForm, manufactureDate: e.target.value })}
+              fullWidth
+              required
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="Ngày nhập kho"
+              type="date"
+              value={productForm.ngayNhapKho}
+              onChange={(e) => setProductForm({ ...productForm, ngayNhapKho: e.target.value })}
+              fullWidth
+              required
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              label="Mô tả"
+              value={productForm.description}
+              onChange={(e) => setProductForm({ ...productForm, description: e.target.value })}
+              fullWidth
+              multiline
+              rows={4}
+            />
+            <TextField
+              label="Thành phần"
+              value={productForm.ingredients}
+              onChange={(e) => setProductForm({ ...productForm, ingredients: e.target.value })}
+              fullWidth
+              multiline
+              rows={4}
+            />
+            <TextField
+              label="Hướng dẫn sử dụng"
+              value={productForm.usageInstructions}
+              onChange={(e) => setProductForm({ ...productForm, usageInstructions: e.target.value })}
+              fullWidth
+              multiline
+              rows={4}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => {
+            setOpenAddModal(false);
+            setOpenEditModal(false);
+          }}>
+            Hủy
+          </Button>
+          <Button onClick={() => handleSubmit(openEditModal)} variant="contained" color="primary">
+            {openAddModal ? 'Thêm' : 'Cập nhật'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+      >
+        <DialogTitle>Xác nhận xóa</DialogTitle>
+        <DialogContent>
+          Bạn có chắc chắn muốn xóa sản phẩm &quot;{selectedProduct?.ProductName}&quot;?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Hủy</Button>
+          <Button onClick={handleConfirmDelete} color="error" variant="contained">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for notifications */}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.severity}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

@@ -169,6 +169,39 @@ const productService = {
             console.error(`Error fetching products by price range:`, error);
             return { $values: [] };
         }
+    },
+
+    // Tạo sản phẩm mới
+    createProduct: async (productData) => {
+        try {
+            const response = await axiosClient.post(API_ENDPOINTS.PRODUCTS.CREATE, productData);
+            return response;
+        } catch (error) {
+            console.error('Error creating product:', error);
+            throw error;
+        }
+    },
+
+    // Cập nhật sản phẩm
+    updateProduct: async (id, productData) => {
+        try {
+            const response = await axiosClient.put(API_ENDPOINTS.PRODUCTS.UPDATE(id), productData);
+            return response;
+        } catch (error) {
+            console.error('Error updating product:', error);
+            throw error;
+        }
+    },
+
+    // Xóa sản phẩm
+    deleteProduct: async (id) => {
+        try {
+            const response = await axiosClient.delete(API_ENDPOINTS.PRODUCTS.DETAIL(id));
+            return response;
+        } catch (error) {
+            console.error('Error deleting product:', error);
+            throw error;
+        }
     }
 };
 

@@ -10,7 +10,10 @@ export const API_ENDPOINTS = {
         LIST: '/api/Products',
         DETAIL: (id) => `/api/Products/${id}`,
         BY_CATEGORY: (categoryId) => `/api/Products/category/${categoryId}`,
-        SEARCH: '/api/Products/search'
+        SEARCH: '/api/Products/search',
+        CREATE: '/api/Products',
+        UPDATE: (id) => `/api/Products/${id}`,
+        DELETE: (id) => `/api/Products/${id}`
     },
     CATEGORIES: {
         LIST: '/api/Category',

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaFilter, FaFileExport, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import orderService from '../../apis/orderService'; // Import orderService
+import * as XLSX from 'xlsx';
 import './Manager.css';
 
 const ViewOrder = () => {
@@ -44,10 +45,6 @@ const ViewOrder = () => {
   ]
 
   const deliveryStatuses = [
-    // 'Not Delivered',
-    // 'In Transit',
-    // 'Delivered'
-
     {
       value: 'Not Delivered',
       label: 'Chưa giao hàng'
@@ -122,6 +119,29 @@ const ViewOrder = () => {
     window.location.href = "/";
   };
 
+  const handleExportExcel = () => {
+    // Prepare data for export
+    const exportData = filteredOrders.map(order => ({
+      'Mã đơn hàng': order.orderId,
+      'Người dùng': order.userId,
+      'Ngày đặt hàng': new Date(order.orderDate).toLocaleString('vi-VN'),
+      'Trạng thái đơn hàng': order.orderStatus,
+      'Trạng thái giao hàng': order.deliveryStatus,
+      'Địa chỉ giao hàng': order.deliveryAddress || 'N/A',
+      'Tổng tiền': order.totalAmount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+    }));
+
+    // Create worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+    
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Đơn hàng');
+
+    // Generate Excel file
+    XLSX.writeFile(wb, `Danh sách đơn hàng ${new Date().toLocaleDateString('vi-VN')}.xlsx`);
+  };
+
   return (
     <Box sx={{ bgcolor: "#f0f0f0", minHeight: "100vh", width:'99vw' }}>
       <div className="manager-container">
@@ -170,7 +190,7 @@ const ViewOrder = () => {
               <button className="btn-filter">
                 <FaFilter /> Filter <span className="notification">1</span>
               </button>
-              <button className="btn-export">
+              <button className="btn-export" onClick={handleExportExcel}>
                 <FaFileExport /> Export
               </button>
 
