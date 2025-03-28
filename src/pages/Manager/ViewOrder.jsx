@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaFilter, FaFileExport, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
@@ -27,7 +27,21 @@ const ViewOrder = () => {
     { id: 'feedback', name: 'Feedback', icon: '📢' },
   ];
 
-  const tabs = ['Tất cả', 'Đơn hàng đang xử lý', 'Đơn hàng bị hủy', 'Giao thành công'];
+  // const tabs = ['Tất cả', 'Đơn hàng đang xử lý', 'Đơn hàng bị hủy', 'Giao thành công'];
+  const tabs = [
+    {
+      value: 'Tất cả',
+      label: 'Tất cả'
+    },
+    {
+      value:'Not Delivered',
+      label: 'Đang xử lý'
+    },
+    {
+      value: 'Cancelled',
+      label: 'Đã hủy'
+    },
+  ]
 
   const deliveryStatuses = [
     // 'Not Delivered',
@@ -47,6 +61,13 @@ const ViewOrder = () => {
       label: 'Đã giao hàng'
     }
   ];
+
+  const filteredOrders = useMemo(() => {
+    return orders.filter((order) => {
+      if (activeTab === 'Tất cả') return true;
+      return order.deliveryStatus === activeTab;
+    });
+  }, [orders, activeTab]);
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -160,11 +181,11 @@ const ViewOrder = () => {
           <div className="dashboard-tabs">
             {tabs.map((tab) => (
               <div 
-                key={tab}
-                className={`tab ${activeTab === tab ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab)}
+                key={tab.value}
+                className={`tab ${activeTab === tab.value ? 'active' : ''}`}
+                onClick={() => setActiveTab(tab.value)}
               >
-                {tab}
+                {tab.label}
               </div>
             ))}
           </div>
@@ -200,8 +221,8 @@ const ViewOrder = () => {
                       Đang tải dữ liệu đơn hàng...
                     </td>
                   </tr>
-                ) : orders.length > 0 ? (
-                  orders.map((order, index) => (
+                ) : filteredOrders.length > 0 ? (
+                  filteredOrders.map((order, index) => (
                     <tr key={order.orderId}>
                       <td>{index + 1}</td>
                       <td>{order.orderId}</td>
