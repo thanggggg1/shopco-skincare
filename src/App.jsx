@@ -37,6 +37,7 @@ import Blog6 from "./pages/Blog/blog6";
 import QuizTest from "./pages/Quiz/QuizTest";
 import Checkout from "./pages/checkout/checkout";
 import ViewOrder from "./pages/Manager/ViewOrder";
+import ViewOrderDetailPage from "./pages/Manager/ViewOrderDetailPage";
 import Product from "./pages/Manager/Product";
 // import Revenue from "./pages/Manager/revenue";
 // import Staff from "./pages/Manager/staff";
@@ -190,9 +191,9 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route path="/checkout/:orderId" element={<Checkout />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/viewOrder" element={<ViewOrder />} />
+            <Route path="/viewOrder/:orderId" element={<ViewOrderDetailPage />} />
             <Route path="/product" element={<Product />} />
             {/* <Route path="/revenue" element={<Revenue />} /> */}
             {/* <Route path="/staff" element={<Staff />} /> */}

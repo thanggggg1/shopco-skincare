@@ -134,6 +134,16 @@ const orderService = {
             throw error;
         }
     },
+    updateOrderDeliveryStatus: async (orderId, deliveryStatus) => {
+        try {
+            const response = await axiosClient.put(`/api/Orders/${orderId}/delivery-status`, { deliveryStatus });
+            return response;
+        } catch (error) {
+            console.error('Error:', error); 
+            throw error;
+        }
+    },
+    
     getCurrentCart: async (userId) => {
         try {
             const response = await axiosClient.get(`/api/Orders/current/${userId}`);
@@ -265,6 +275,15 @@ const orderService = {
             return response;
         } catch (error) {
             console.error('Error fetching order items:', error);
+            throw error;
+        }
+    },
+    deleteOrder: async (orderId) => {
+        try {
+            const response = await axiosClient.delete(`/api/Orders/${orderId}`);
+            return response;
+        } catch (error) {
+            console.error('Error deleting order:', error);
             throw error;
         }
     }

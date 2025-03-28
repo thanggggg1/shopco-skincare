@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaFilter, FaFileExport } from 'react-icons/fa';
-import { Box } from '@mui/material';
+import { FaFilter, FaFileExport, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
+import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import orderService from '../../apis/orderService'; // Import orderService
 import './Manager.css';
 
@@ -10,6 +10,10 @@ const ViewOrder = () => {
   const [activeItem, setActiveItem] = useState('');
   const [orders, setOrders] = useState([]); // State to hold orders
   const [loading, setLoading] = useState(true); // State to manage loading
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [openStatusModal, setOpenStatusModal] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [newStatus, setNewStatus] = useState('');
   const navigate = useNavigate();
 
   const sidebarItems = [
@@ -25,12 +29,29 @@ const ViewOrder = () => {
 
   const tabs = ['Tất cả', 'Đơn hàng đang xử lý', 'Đơn hàng bị hủy', 'Giao thành công'];
 
+  const deliveryStatuses = [
+    // 'Not Delivered',
+    // 'In Transit',
+    // 'Delivered'
+
+    {
+      value: 'Not Delivered',
+      label: 'Chưa giao hàng'
+    },
+    {
+      value: 'In Transit',
+      label: 'Đang giao hàng'
+    },
+    {
+      value: 'Delivered',
+      label: 'Đã giao hàng'
+    }
+  ];
+
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const allOrders = await orderService.getOrders(); // Call API to get all orders
-
-        console.log("allOrders", allOrders);
         setOrders(allOrders);
 
       } catch (error) {
@@ -42,11 +63,44 @@ const ViewOrder = () => {
 
     fetchOrders();
   }, []);
+
+  const handleStatusUpdate = async () => {
+    if (!selectedOrder || !newStatus) return;
+
+    try {
+      await orderService.updateOrderDeliveryStatus(selectedOrder.orderId, newStatus);
+      // Refresh orders list
+      const updatedOrders = await orderService.getOrders();
+      setOrders(updatedOrders);
+      setOpenStatusModal(false);
+      setSelectedOrder(null);
+      setNewStatus('');
+    } catch (error) {
+      console.error('Error updating order status:', error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedOrder) return;
+
+    try {
+      await orderService.deleteOrder(selectedOrder.orderId);
+      // Refresh orders list
+      const updatedOrders = await orderService.getOrders();
+      setOrders(updatedOrders);
+      setOpenDeleteModal(false);
+      setSelectedOrder(null);
+    } catch (error) {
+      console.error('Error deleting order:', error);
+    }
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("userid");
     window.location.href = "/";
   };
+
   return (
     <Box sx={{ bgcolor: "#f0f0f0", minHeight: "100vh", width:'99vw' }}>
       <div className="manager-container">
@@ -129,15 +183,14 @@ const ViewOrder = () => {
               <thead>
                 <tr>
                   <th>STT</th>
-                  <th>OrderID</th>
-                  <th>UserID</th>
-                  <th>OrderDate</th>
-                  <th>OrderStatus</th>
-                  <th>DeliveryStatus</th>
-                  <th>DeliveryAddress</th>
-                  <th>TotalAmount</th>
-                  
- 
+                  <th>Mã đơn hàng</th>
+                  <th>Người dùng</th>
+                  <th>Ngày đặt hàng</th>
+                  <th>Trạng thái đơn hàng</th>
+                  <th>Trạng thái giao hàng</th>
+                  <th>Địa chỉ giao hàng</th>
+                  <th>Tổng tiền</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,6 +211,38 @@ const ViewOrder = () => {
                       <td>{order.deliveryStatus}</td>
                       <td>{order.deliveryAddress}</td>
                       <td>{order.totalAmount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                          <button 
+                            className="action-btn view-btn"
+                            onClick={() => navigate(`/viewOrder/${order.orderId}`)}
+                            title="Xem chi tiết"
+                          >
+                            <FaEye />
+                          </button>
+                          <button 
+                            className="action-btn edit-btn"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setNewStatus(order.deliveryStatus);
+                              setOpenStatusModal(true);
+                            }}
+                            title="Cập nhật trạng thái"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button 
+                            className="action-btn delete-btn"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setOpenDeleteModal(true);
+                            }}
+                            title="Xóa đơn hàng"
+                          >
+                            <FaTrash />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))
                 ) : (
@@ -172,6 +257,47 @@ const ViewOrder = () => {
           </div>
         </div>
       </div>
+
+      {/* Status Update Modal */}
+      <Dialog open={openStatusModal} onClose={() => setOpenStatusModal(false)}>
+        <DialogTitle>Cập nhật trạng thái giao hàng</DialogTitle>
+        <DialogContent>
+          <FormControl fullWidth sx={{ mt: 2 }}>
+            <InputLabel>Trạng thái</InputLabel>
+            <Select
+              value={newStatus}
+              onChange={(e) => setNewStatus(e.target.value)}
+              label="Trạng thái"
+            >
+              {deliveryStatuses.map((status) => (
+                <MenuItem key={status.value} value={status.value}>
+                  {status.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenStatusModal(false)}>Hủy</Button>
+          <Button onClick={handleStatusUpdate} variant="contained" color="primary">
+            Cập nhật
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <DialogTitle>Xác nhận xóa đơn hàng</DialogTitle>
+        <DialogContent>
+          <p>Bạn có chắc chắn muốn xóa đơn hàng #{selectedOrder?.orderId}?</p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteModal(false)}>Hủy</Button>
+          <Button onClick={handleDelete} variant="contained" color="error">
+            Xóa
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
