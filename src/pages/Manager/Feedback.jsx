@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { FaFilter, FaFileExport, FaPlus } from 'react-icons/fa';
+import { FaFilter } from 'react-icons/fa';
 import { Box, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, MenuItem, Pagination, CircularProgress } from '@mui/material';
 import './Manager.css';
 import { useNavigate } from 'react-router-dom';
@@ -26,8 +26,8 @@ const Feedback = () => {
   const pageSize = 10;
 
   const sidebarItems = [
-    { id: 'revenue', name: 'Doanh thu', icon: '📊' },
-    { id: 'staff', name: 'Nhân viên', icon: '👤' },
+    // { id: 'revenue', name: 'Doanh thu', icon: '📊' },
+    // { id: 'staff', name: 'Nhân viên', icon: '👤' },
     { id: 'viewOrder', name: 'Đơn hàng', icon: '📋' },
     { id: 'product', name: 'Sản phẩm', icon: '📦' },
     { id: 'viewCustomer', name: 'Hồ sơ khách hàng', icon: '📝' },

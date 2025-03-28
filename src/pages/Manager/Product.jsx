@@ -24,8 +24,8 @@ const Product = () => {
   const pageSize = 20;
 
   const sidebarItems = [
-    { id: 'revenue', name: 'Doanh thu', icon: '📊' },
-    { id: 'staff', name: 'Nhân viên', icon: '👤' },
+    // { id: 'revenue', name: 'Doanh thu', icon: '📊' },
+    // { id: 'staff', name: 'Nhân viên', icon: '👤' },
     { id: 'viewOrder', name: 'Đơn hàng', icon: '📋' },
     { id: 'product', name: 'Sản phẩm', icon: '📦' },
     { id: 'viewCustomer', name: 'Hồ sơ khách hàng', icon: '📝' },

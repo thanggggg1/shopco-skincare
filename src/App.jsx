@@ -38,8 +38,8 @@ import QuizTest from "./pages/Quiz/QuizTest";
 import Checkout from "./pages/checkout/checkout";
 import ViewOrder from "./pages/Manager/ViewOrder";
 import Product from "./pages/Manager/Product";
-import Revenue from "./pages/Manager/revenue";
-import Staff from "./pages/Manager/staff";
+// import Revenue from "./pages/Manager/revenue";
+// import Staff from "./pages/Manager/staff";
 import ViewCustomer from "./pages/Manager/ViewCustomer";
 import ViewSupport from "./pages/Manager/ViewSupport";
 import Voucher from "./pages/Manager/Voucher";
@@ -194,8 +194,8 @@ export default function App() {
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/viewOrder" element={<ViewOrder />} />
             <Route path="/product" element={<Product />} />
-            <Route path="/revenue" element={<Revenue />} />
-            <Route path="/staff" element={<Staff />} />
+            {/* <Route path="/revenue" element={<Revenue />} /> */}
+            {/* <Route path="/staff" element={<Staff />} /> */}
             <Route path="/viewCustomer" element={<ViewCustomer />} />
             <Route path="/viewSupport" element={<ViewSupport />} />
             <Route path="/voucher" element={<Voucher />} />

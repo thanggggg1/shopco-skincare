@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { FaFilter, FaFileExport, FaPlus } from 'react-icons/fa';
+import { FaFilter, FaFileExport } from 'react-icons/fa';
 import { Box } from '@mui/material';
 import './Manager.css';
 import { useState } from 'react';
@@ -9,8 +9,8 @@ const ViewSupport = () => {
   const [activeItem, setActiveItem] = useState('');
 
   const sidebarItems = [
-    { id: 'revenue', name: 'Doanh thu', icon: '📊' },
-    { id: 'staff', name: 'Nhân viên', icon: '👤' },
+    // { id: 'revenue', name: 'Doanh thu', icon: '📊' },
+    // { id: 'staff', name: 'Nhân viên', icon: '👤' },
     { id: 'viewOrder', name: 'Đơn hàng', icon: '📋' },
     { id: 'product', name: 'Sản phẩm', icon: '📦' },
     { id: 'viewCustomer', name: 'Hồ sơ khách hàng', icon: '📝' },
@@ -75,9 +75,7 @@ const ViewSupport = () => {
             <button className="btn-export">
               <FaFileExport /> Export
             </button>
-            <button className="btn-create-payment">
-              <FaPlus /> Create payment
-            </button>
+
           </div>
         </div>
         

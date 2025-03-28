@@ -13,7 +13,7 @@ export default function MainScreen() {
   useEffect(() => {
     const userid = localStorage.getItem("userid");
     if (userid && userid == 1) {
-      navigate("/staff");
+      navigate("/viewOrder");
     }
   }, [navigate]);
   return (

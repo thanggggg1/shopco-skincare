@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaFilter, FaFileExport, FaPlus } from 'react-icons/fa';
+import { FaFilter, FaFileExport } from 'react-icons/fa';
 import { Box } from '@mui/material';
 import orderService from '../../apis/orderService'; // Import orderService
 import './Manager.css';
@@ -10,12 +10,11 @@ const ViewOrder = () => {
   const [activeItem, setActiveItem] = useState('');
   const [orders, setOrders] = useState([]); // State to hold orders
   const [loading, setLoading] = useState(true); // State to manage loading
-  const [orderItems, setOrderItems] = useState([]); // State to hold order items
   const navigate = useNavigate();
 
   const sidebarItems = [
-    { id: 'revenue', name: 'Doanh thu', icon: '📊' },
-    { id: 'staff', name: 'Nhân viên', icon: '👤' },
+    // { id: 'revenue', name: 'Doanh thu', icon: '📊' },
+    // { id: 'staff', name: 'Nhân viên', icon: '👤' },
     { id: 'viewOrder', name: 'Đơn hàng', icon: '📋' },
     { id: 'product', name: 'Sản phẩm', icon: '📦' },
     { id: 'viewCustomer', name: 'Hồ sơ khách hàng', icon: '📝' },
@@ -30,12 +29,10 @@ const ViewOrder = () => {
     const fetchOrders = async () => {
       try {
         const allOrders = await orderService.getOrders(); // Call API to get all orders
+
+        console.log("allOrders", allOrders);
         setOrders(allOrders);
 
-        // Fetch order items for each order
-        const itemsPromises = allOrders.map(order => orderService.getOrderItems(order.orderId));
-        const allOrderItems = await Promise.all(itemsPromises);
-        setOrderItems(allOrderItems);
       } catch (error) {
         console.error('Error fetching orders:', error);
       } finally {
@@ -101,9 +98,7 @@ const ViewOrder = () => {
               <button className="btn-export">
                 <FaFileExport /> Export
               </button>
-              <button className="btn-create-payment">
-                <FaPlus /> Create payment
-              </button>
+
             </div>
           </div>
           
@@ -119,24 +114,30 @@ const ViewOrder = () => {
               </div>
             ))}
           </div>
-          
+
+            {/* "$id": "2",
+      "orderId": 14,
+      "userId": 1,
+      "orderDate": "2025-03-05T15:37:02.253",
+      "orderStatus": "Paid",
+      "deliveryStatus": "Not Delivered",
+      "deliveryAddress": null,
+      "totalAmount": 498000, */}
           {/* Table */}
           <div className="dashboard-table">
             <table>
               <thead>
                 <tr>
+                  <th>STT</th>
                   <th>OrderID</th>
                   <th>UserID</th>
-                  <th>ProductName</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>VoucherID</th>
-                  <th>TotalAmount</th>
                   <th>OrderDate</th>
                   <th>OrderStatus</th>
                   <th>DeliveryStatus</th>
-                  <th>DeliveryAddress</th>          
-                  <th>Note</th>    
+                  <th>DeliveryAddress</th>
+                  <th>TotalAmount</th>
+                  
+ 
                 </tr>
               </thead>
               <tbody>
@@ -149,18 +150,14 @@ const ViewOrder = () => {
                 ) : orders.length > 0 ? (
                   orders.map((order, index) => (
                     <tr key={order.orderId}>
+                      <td>{index + 1}</td>
                       <td>{order.orderId}</td>
                       <td>{order.userId}</td>
-                      <td>{orderItems[index]?.map(item => item.productName).join(', ')}</td>
-                      <td>{orderItems[index]?.map(item => item.price).join(', ')}</td>
-                      <td>{orderItems[index]?.map(item => item.quantity).join(', ')}</td>
-                      <td>{order.voucherId}</td>
-                      <td>{order.totalAmount}</td>
                       <td>{order.orderDate}</td>
                       <td>{order.orderStatus}</td>
                       <td>{order.deliveryStatus}</td>
                       <td>{order.deliveryAddress}</td>
-                      <td>{order.note}</td>
+                      <td>{order.totalAmount?.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })}</td>
                     </tr>
                   ))
                 ) : (

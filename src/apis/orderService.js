@@ -1,7 +1,7 @@
 import axiosClient from './axiosClient';
 
 const orderService = {
-    getOrders: async (userId) => {
+    getOrders: async () => {
         // {
         //     "userId": 0,
         //     "productId": 0,
@@ -10,8 +10,7 @@ const orderService = {
         try {
             const response = await axiosClient.get('/api/Orders');
             const values = response['$values'];
-            const orderByUser = values.filter(order => order.userId === userId);
-            return orderByUser;
+            return values;
             // {
             //     "$id": "1",
             //     "$values": [
