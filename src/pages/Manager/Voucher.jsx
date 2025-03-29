@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Box } from '@mui/material';
+import { Box, Modal, TextField, Button, Typography, MenuItem } from '@mui/material';
 import './Manager.css';
 import { useState, useEffect } from 'react';
 import voucherService from '../../apis/voucherService';
@@ -12,6 +12,20 @@ const Voucher = () => {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [originalVouchers, setOriginalVouchers] = useState([]);
+  const [openModal, setOpenModal] = useState(false);
+  const [editingVoucher, setEditingVoucher] = useState(null);
+  const [formData, setFormData] = useState({
+    voucherName: '',
+    discountPercent: '',
+    minOrderAmount: '',
+    startDate: '',
+    endDate: '',
+    quantity: '',
+    status: 'Active',
+    description: ''
+  });
+
+  const statusOptions = ['Active', 'Inactive', 'Expired'];
 
   const sidebarItems = [
     // { id: 'revenue', name: 'Doanh thu', icon: '📊' },
@@ -74,12 +88,90 @@ const Voucher = () => {
     setVouchers(originalVouchers);
   };
 
-  const handleEdit = async (voucherId) => {
+  const handleOpenModal = (voucher = null) => {
+    if (voucher) {
+      setEditingVoucher(voucher);
+      setFormData({
+        voucherName: voucher.voucherName,
+        discountPercent: voucher.discountPercent,
+        minOrderAmount: voucher.minOrderAmount,
+        startDate: new Date(voucher.startDate).toISOString().split('T')[0],
+        endDate: new Date(voucher.endDate).toISOString().split('T')[0],
+        quantity: voucher.quantity,
+        status: voucher.status,
+        description: voucher.description
+      });
+    } else {
+      setEditingVoucher(null);
+      setFormData({
+        voucherName: '',
+        discountPercent: '',
+        minOrderAmount: '',
+        startDate: '',
+        endDate: '',
+        quantity: '',
+        status: 'Active',
+        description: ''
+      });
+    }
+    setOpenModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    setEditingVoucher(null);
+    setFormData({
+      voucherName: '',
+      discountPercent: '',
+      minOrderAmount: '',
+      startDate: '',
+      endDate: '',
+      quantity: '',
+      status: 'Active',
+      description: ''
+    });
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      console.log(`Chỉnh sửa voucher có ID: ${voucherId}`);
-      // TODO: Implement edit logic
+      // Format the data according to API requirements
+      const formattedData = {
+        voucherName: formData.voucherName,
+        discountPercent: Number(formData.discountPercent),
+        minOrderAmount: Number(formData.minOrderAmount),
+        startDate: new Date(formData.startDate).toISOString(),
+        endDate: new Date(formData.endDate).toISOString(),
+        quantity: Number(formData.quantity),
+        status: formData.status,
+        description: formData.description
+      };
+
+      if (editingVoucher) {
+        await voucherService.updateVoucher(editingVoucher.voucherId, formattedData);
+        setVouchers(vouchers.map(v => 
+          v.voucherId === editingVoucher.voucherId ? { ...v, ...formattedData } : v
+        ));
+        setOriginalVouchers(originalVouchers.map(v => 
+          v.voucherId === editingVoucher.voucherId ? { ...v, ...formattedData } : v
+        ));
+      } else {
+        const response = await voucherService.createVoucher(formattedData);
+        setVouchers([...vouchers, response]);
+        setOriginalVouchers([...originalVouchers, response]);
+      }
+      handleCloseModal();
     } catch (error) {
-      console.error('Lỗi khi chỉnh sửa voucher:', error);
+      console.error('Error saving voucher:', error);
+      alert('Có lỗi xảy ra khi lưu voucher. Vui lòng thử lại.');
     }
   };
 
@@ -97,8 +189,14 @@ const Voucher = () => {
   };
 
   const handleAdd = () => {
-    console.log('Thêm voucher mới');
-    // TODO: Implement add logic
+    handleOpenModal();
+  };
+
+  const handleEdit = (voucherId) => {
+    const voucher = vouchers.find(v => v.voucherId === voucherId);
+    if (voucher) {
+      handleOpenModal(voucher);
+    }
   };
 
   return (
@@ -288,6 +386,125 @@ const Voucher = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal for Create/Edit Voucher */}
+      <Modal
+        open={openModal}
+        onClose={handleCloseModal}
+        aria-labelledby="voucher-modal-title"
+        aria-describedby="voucher-modal-description"
+      >
+        <Box sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 400,
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 4,
+          borderRadius: 1
+        }}>
+          <Typography id="voucher-modal-title" variant="h6" component="h2" gutterBottom>
+            {editingVoucher ? 'Chỉnh sửa Voucher' : 'Thêm Voucher Mới'}
+          </Typography>
+          <form onSubmit={handleSubmit}>
+            <TextField
+              fullWidth
+              label="Tên Voucher"
+              name="voucherName"
+              value={formData.voucherName}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Phần trăm giảm giá"
+              name="discountPercent"
+              type="number"
+              value={formData.discountPercent}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Đơn tối thiểu"
+              name="minOrderAmount"
+              type="number"
+              value={formData.minOrderAmount}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              label="Ngày bắt đầu"
+              name="startDate"
+              type="date"
+              value={formData.startDate}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              fullWidth
+              label="Ngày kết thúc"
+              name="endDate"
+              type="date"
+              value={formData.endDate}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              fullWidth
+              label="Số lượng"
+              name="quantity"
+              type="number"
+              value={formData.quantity}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+            />
+            <TextField
+              fullWidth
+              select
+              label="Trạng thái"
+              name="status"
+              value={formData.status}
+              onChange={handleInputChange}
+              margin="normal"
+              required
+            >
+              {statusOptions.map((option) => (
+                <MenuItem key={option} value={option}>
+                  {option}
+                </MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              fullWidth
+              label="Mô tả"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              margin="normal"
+              multiline
+              rows={3}
+            />
+            <Box sx={{ mt: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+              <Button onClick={handleCloseModal}>Hủy</Button>
+              <Button type="submit" variant="contained" color="primary">
+                {editingVoucher ? 'Cập nhật' : 'Thêm mới'}
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Modal>
     </Box>
   );
 };
