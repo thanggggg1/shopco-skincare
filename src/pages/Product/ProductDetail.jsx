@@ -98,9 +98,9 @@ export default function ProductDetail() {
   console.log("reviews", reviews);
 
   const averageRating = useMemo(() => {
-    if (reviews.length === 0) return 0;
-    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
-    return (totalRating / reviews.length).toFixed(1);
+    if (reviews?.length === 0) return 0;
+    const totalRating = reviews?.reduce((sum, review) => sum + review.rating, 0);
+    return (totalRating / reviews?.length).toFixed(1);
   }, [reviews]);
   const handleThumbnailClick = (imageUrl) => {
   // Update the selected thumbnail index
