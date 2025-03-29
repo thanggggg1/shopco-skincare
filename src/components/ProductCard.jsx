@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, Typography, Box, Rating, IconButton, Checkbox, Tooltip } from '@mui/material';
+import { Card, CardContent, Typography, Box, IconButton, Checkbox, Tooltip } from '@mui/material';
 import { useState, useContext } from 'react';
 import CompareIcon from '@mui/icons-material/Compare';
 import PropTypes from 'prop-types';
@@ -102,12 +102,12 @@ export default function ProductCard({ product }) {
           </Typography>
         </Box>
 
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+        {/* <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
           <Rating value={product.rating || 0} precision={0.5} readOnly size="small" />
           <Typography variant="body2" color="text.secondary">
             Đã bán {product?.totalSold || 0}
           </Typography>
-        </Box>
+        </Box> */}
       </CardContent>
     </Card>
   );

@@ -51,7 +51,7 @@ const ViewOrderDetailPage = () => {
   };
 
   const handleBack = () => {
-    navigate('/viewOrder');
+    navigate(-1);
   };
 
   const formatDate = (dateString) => {

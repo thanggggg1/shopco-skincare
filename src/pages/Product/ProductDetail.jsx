@@ -1,4 +1,4 @@
-import { useState, useEffect, memo, useRef } from 'react';
+import { useState, useEffect, memo, useRef, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { 
@@ -94,6 +94,14 @@ export default function ProductDetail() {
   const [totalSold, setTotalSold] = useState(0);
   const [mainImageUrl, setMainImageUrl] = useState('');
   
+
+  console.log("reviews", reviews);
+
+  const averageRating = useMemo(() => {
+    if (reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + review.rating, 0);
+    return (totalRating / reviews.length).toFixed(1);
+  }, [reviews]);
   const handleThumbnailClick = (imageUrl) => {
   // Update the selected thumbnail index
   setMainImageUrl(imageUrl);
@@ -325,7 +333,7 @@ export default function ProductDetail() {
                 
                 {/* Ratings */}
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                  <Rating value={4.5} precision={0.5} readOnly size="small" />
+                  <Rating value={averageRating} precision={0.5} readOnly size="small" />
                   <Typography variant="body2" sx={{ ml: 1 }}>
                     {reviews?.length} đánh giá
                   </Typography>
