@@ -436,12 +436,12 @@ const Checkout = () => {
                   {`-${calculateDiscount().toLocaleString()} ₫`}
                 </Typography>
               </Box>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
+              {/* <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
                 <Typography>Phí vận chuyển:</Typography>
                 <Typography sx={{ color: '#ff6b6b', fontWeight: 'bold' }}>
                   30.000 ₫
                 </Typography>
-              </Box>
+              </Box> */}
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 3 }}>
                 <Typography>Thành tiền:</Typography>
                 <Typography sx={{ color: '#ff6b6b', fontWeight: 'bold' }}>

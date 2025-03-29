@@ -127,7 +127,8 @@ export default function ProductDetail() {
       if (isMounted.current) {
         setProduct({
           ...fetchedProduct,
-          discountedPrice: fetchedProduct.price - (fetchedProduct.price * 15 / 100),
+          discountedPrice: fetchedProduct.price,
+          price: fetchedProduct.price * 1.14,
           relatedProducts: [
             {
               id: 1,
